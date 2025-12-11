@@ -113,13 +113,18 @@ void playNote(uint8_t note, bool state)
 
   //digitalWrite(pin, state);
   DEBUG("\nNOTE: ", note);
+  DEBUG("\nSTATE: ", state);
 
+  //NeoPixel.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
-
-  NeoPixel.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
-  NeoPixel.setPixelColor(note - 21, NeoPixel.Color(0, 255, 0));
+  if (state) {
+    NeoPixel.setPixelColor(note - 21, NeoPixel.Color(0, 255, 0));
+  }else{
+    NeoPixel.setPixelColor(note - 21, NeoPixel.Color(0, 0, 0));
+  }
+  
   NeoPixel.show();
-  delay(300);   // optional
+  delay(500);   // optional
 }
 
 void midiCallback(midi_event *pev)
