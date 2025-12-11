@@ -13,7 +13,7 @@
 // -----------------------------------------------------------------------
 #include <Adafruit_NeoPixel.h>
 #define PIN_NEO_PIXEL 2  // The ESP32 pin GPIO16 connected to NeoPixel
-#define NUM_PIXELS 30     // The number of LEDs (pixels) on NeoPixel LED strip
+#define NUM_PIXELS 300     // The number of LEDs (pixels) on NeoPixel LED strip
 
 Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
 
@@ -114,10 +114,12 @@ void playNote(uint8_t note, bool state)
   //digitalWrite(pin, state);
   DEBUG("\nNOTE: ", note);
 
+
+
   NeoPixel.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
-  NeoPixel.setPixelColor(note - 65, NeoPixel.Color(0, 255, 0));
+  NeoPixel.setPixelColor(note - 21, NeoPixel.Color(0, 255, 0));
   NeoPixel.show();
-  delay(1000);   // optional
+  delay(300);   // optional
 }
 
 void midiCallback(midi_event *pev)
