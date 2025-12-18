@@ -126,26 +126,6 @@ void midiCallback(midi_event *pev)
   }
 }
 
-void midiSilence(void)
-// Turn everything off on every channel.
-// Some midi files are badly behaved and leave notes hanging, so at the 
-// end of a playing a song, explicitely turn off all the notes and sound 
-// on every channel.
-{
-  midi_event ev;
-
-  // All sound off
-  // When All Sound Off is received all oscillators will turn off, and their volume
-  // envelopes are set to zero as soon as possible.
-  ev.size = 0;
-  ev.data[ev.size++] = CTL_CHANGE;
-  ev.data[ev.size++] = CH_ALL_NOTE_OFF;
-  ev.data[ev.size++] = 0;
-
-  for (ev.channel = 0; ev.channel < 16; ev.channel++)
-    midiCallback(&ev);
-}
-
 void setup(void)
 {
 #if USE_DEBUG
@@ -208,7 +188,7 @@ void loop(void)
   case S_END:   // done with this one
     DEBUGS("\nS_END");
     SMF.close();
-    midiSilence();
+    NeoPixel.clear();
     timeStart = millis();
     state = S_PAUSE;
     DEBUGS("\nPAUSE");
