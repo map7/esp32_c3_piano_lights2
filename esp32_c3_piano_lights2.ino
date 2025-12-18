@@ -6,8 +6,6 @@
 //  SD card interface - change SD_SELECT for SPI comms
 //  I/O defined for custom notes output - Change pin definitions for specific 
 //      hardware or other hardware actuation - defined below.
-
-
 // -----------------------------------------------------------------------
 // Neopixel
 // -----------------------------------------------------------------------
@@ -72,8 +70,6 @@ const uint8_t CH_POLY_ON = 0x7f;      // poly mode on (Omni off)
 const char fileName[] = "pianosolo.mid";
 //const char fileName[] = "test.mid";
 //const char fileName[] = "the_final_countdown.mid";
-
-
 //const char fileName[] = "LOOPDEMO.MID";
 //const char fileName[] = "TWINKLE.MID";
 //const char fileName[] = "POPCORN.MID";
@@ -84,38 +80,10 @@ const uint8_t SILENT = LOW;
 SDFAT	SD;
 MD_MIDIFile SMF;
 
-// Define the list of I/O pins used by the application toplay notes.
-// Put all the I/O PIN numbers here!
-const uint8_t PROGMEM pinIO[] = { 3, 4, 5, 6, 7, 8, 9, A0, A1, A2, A3 };
-
-// Define an index into the I/O pin array each MIDI note.
-// Put the array index of the pin in the pinIO array here (eg, 2 if the  
-// note is played using the third pin defined in the array). This is used 
-// by playNote() to work out which pin to drive ACTIVE or SILENT.
-const uint8_t PROGMEM noteIO[128] =
-{
-  // C  C#   D  D#   E   F   G  G#   A   B  B#       Notes 
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //   0- 11: Octave  0
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  12- 23: Octave  1
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  24- 35: Octave  2
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  36- 47: Octave  3
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  48- 59: Octave  4
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  60- 71: Octave  5
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  72- 83: Octave  6
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  84- 95: Octave  7
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, //  96-107: Octave  8
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, // 108-119: Octave  9
-     0,  1,  2,  3,  4,  5,  6                  // 120-127: Octave 10
-};
-
 void playNote(uint8_t note, bool state)
 {
   if (note > 128) return;
 
-  uint8_t idx = pgm_read_byte(noteIO + note);
-  uint8_t pin = pgm_read_byte(pinIO + idx);
-
-  //digitalWrite(pin, state);
   DEBUG("\nNOTE: ", note);
   DEBUG("\nSTATE: ", state);
 
@@ -188,15 +156,6 @@ void midiCallback(midi_event *pev)
       DEBUGS(" CH_LOCAL_CTL");
       break;
 
-    case CH_ALL_NOTE_OFF: // no data
-      DEBUGS(" CH_ALL_NOTE_OFF");
-      for (uint8_t i = 0; i < ARRAY_SIZE(pinIO); i++)
-      {
-        uint8_t pin = pgm_read_byte(pinIO + i);
-        digitalWrite(pin, SILENT);
-      }
-      break;
-
     case CH_OMNI_OFF:     // no data
       DEBUGS(" CH_OMNI_OFF");
       break;
@@ -247,13 +206,6 @@ void setup(void)
 
   NeoPixel.begin();  // initialize NeoPixel strip object (REQUIRED)
 
-  // initialise I/O
-  for (uint8_t i = 0; i < ARRAY_SIZE(pinIO); i++)
-  {
-    uint8_t pin = pgm_read_byte(pinIO + i);
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-  }
   // Initialize SD
   if (!SD.begin(SD_SELECT, SPI_FULL_SPEED))
   {
