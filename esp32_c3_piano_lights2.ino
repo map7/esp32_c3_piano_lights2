@@ -123,57 +123,6 @@ void midiCallback(midi_event *pev)
     // Note ON with velocity 0 is the same as off
     playNote(pev->data[1], (pev->data[2] == 0) ? SILENT : ACTIVE);
     break;
-
-  case POLY_KEY:    // [1]=key no, [2]=pressure
-    DEBUGS(" POLY_KEY");
-    break;
-
-  case PROG_CHANGE: // [1]=program no
-    DEBUGS(" PROG_CHANGE");
-    break;
-
-  case CHAN_PRESS:  // [1]=pressure value
-    DEBUGS(" CHAN_PRESS");
-    break;
-
-  case PITCH_BEND:  // [1]=MSB, [2]=LSB
-    DEBUGS(" PITCH_BLEND");
-    break;
-
-  case CTL_CHANGE:  // [1]=controller no, [2]=controller value
-  {
-    DEBUGS(" CTL_CHANGE");
-    switch (pev->data[1])
-    {
-    default:              // non reserved controller
-      break;
-
-    case CH_RESET_ALL:    // no data
-      DEBUGS(" CH_RESET_ALL");
-      break;
-
-    case CH_LOCAL_CTL:    // data[2]=0 off, data[1]=127 on
-      DEBUGS(" CH_LOCAL_CTL");
-      break;
-
-    case CH_OMNI_OFF:     // no data
-      DEBUGS(" CH_OMNI_OFF");
-      break;
-
-    case CH_OMNI_ON:      // no data
-      DEBUGS(" CH_OMNI_ON");
-      break;
-
-    case CH_MONO_ON:      // data[2]=0 for all, otherwise actual qty
-      DEBUGS(" CH_MONO_ON");
-      break;
-
-    case CH_POLY_ON:      // no data
-      DEBUGS(" CH_POLY_ON");
-      break;
-    }
-  }
-  break;
   }
 }
 
