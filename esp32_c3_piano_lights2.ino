@@ -51,20 +51,6 @@ const uint16_t WAIT_DELAY = 2000; // ms
 // Define constants for MIDI channel voice message IDs
 const uint8_t NOTE_OFF = 0x80;    // note on
 const uint8_t NOTE_ON = 0x90;     // note off. NOTE_ON with velocity 0 is same as NOTE_OFF
-const uint8_t POLY_KEY = 0xa0;    // polyphonic key press
-const uint8_t CTL_CHANGE = 0xb0;  // control change
-const uint8_t PROG_CHANGE = 0xc0; // program change
-const uint8_t CHAN_PRESS = 0xd0;  // channel pressure
-const uint8_t PITCH_BEND = 0xe0;  // pitch bend
-
-// Define constants for MIDI channel control special channel numbers
-const uint8_t CH_RESET_ALL = 0x79;    // reset all controllers
-const uint8_t CH_LOCAL_CTL = 0x7a;    // local control
-const uint8_t CH_ALL_NOTE_OFF = 0x7b; // all notes off
-const uint8_t CH_OMNI_OFF = 0x7c;     // omni mode off
-const uint8_t CH_OMNI_ON = 0x7d;      // omni mode on 
-const uint8_t CH_MONO_ON = 0x7e;      // mono mode on (Poly off)
-const uint8_t CH_POLY_ON = 0x7f;      // poly mode on (Omni off)
 
 // The files in should be located on the SD card
 const char fileName[] = "pianosolo.mid";
