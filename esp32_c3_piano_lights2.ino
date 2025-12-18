@@ -70,6 +70,10 @@ const uint8_t CH_POLY_ON = 0x7f;      // poly mode on (Omni off)
 
 // The files in should be located on the SD card
 const char fileName[] = "pianosolo.mid";
+//const char fileName[] = "test.mid";
+//const char fileName[] = "the_final_countdown.mid";
+
+
 //const char fileName[] = "LOOPDEMO.MID";
 //const char fileName[] = "TWINKLE.MID";
 //const char fileName[] = "POPCORN.MID";
@@ -124,7 +128,6 @@ void playNote(uint8_t note, bool state)
   }
   
   NeoPixel.show();
-  delay(500);   // optional
 }
 
 void midiCallback(midi_event *pev)
