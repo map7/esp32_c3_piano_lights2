@@ -53,7 +53,9 @@ const uint8_t NOTE_OFF = 0x80;    // note on
 const uint8_t NOTE_ON = 0x90;     // note off. NOTE_ON with velocity 0 is same as NOTE_OFF
 
 // The files in should be located on the SD card
-const char fileName[] = "pianosolo.mid";
+//const char fileName[] = "pianosolo.mid";
+//const char fileName[] = "furelise.mid";
+const char fileName[] = "Let_It_Be.mid";
 //const char fileName[] = "test.mid";
 //const char fileName[] = "the_final_countdown.mid";
 //const char fileName[] = "LOOPDEMO.MID";
@@ -89,27 +91,31 @@ void midiCallback(midi_event *pev)
 // This callback is set up in the setup() function.
 // Note: MIDI Channel 10 (pev->channel == 9) is for percussion instruments
 {
-  DEBUG("\n", millis());
-  DEBUG("\tM T", pev->track);
-  DEBUG(":  Ch ", pev->channel+1);
-  DEBUGS(" Data");
-  for (uint8_t i=0; i<pev->size; i++)
-    DEBUGX(" ", pev->data[i]);
+  // if(pev->channel+1 == 1){
+    DEBUG("\n", millis());
+    DEBUG("\tM T", pev->track);
+    DEBUG(":  Ch ", pev->channel+1);
+    DEBUGS(" Data");
 
-  // Handle the event through our I/O interface
-  switch (pev->data[0])
-  {
-  case NOTE_OFF:    // [1]=note no, [2]=velocity
-    DEBUGS(" NOTE_OFF");
-    playNote(pev->data[1], SILENT);
-    break;
+    for (uint8_t i=0; i<pev->size; i++)
+      DEBUGX(" ", pev->data[i]);
 
-  case NOTE_ON:     // [1]=note_no, [2]=velocity
-    DEBUGS(" NOTE_ON");
-    // Note ON with velocity 0 is the same as off
-    playNote(pev->data[1], (pev->data[2] == 0) ? SILENT : ACTIVE);
-    break;
-  }
+    // Handle the event through our I/O interface
+    switch (pev->data[0])
+    {
+    case NOTE_OFF:    // [1]=note no, [2]=velocity
+      DEBUGS(" NOTE_OFF");
+      playNote(pev->data[1], SILENT);
+      break;
+
+    case NOTE_ON:     // [1]=note_no, [2]=velocity
+      DEBUGS(" NOTE_ON");
+      // Note ON with velocity 0 is the same as off
+      playNote(pev->data[1], (pev->data[2] == 0) ? SILENT : ACTIVE);
+      break;
+    }
+
+  // }
 }
 
 void setup(void)
