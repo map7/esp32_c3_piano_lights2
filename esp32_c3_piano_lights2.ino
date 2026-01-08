@@ -59,6 +59,24 @@ Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
 
 #endif // USE_DEBUG
 
+#if SD_FAT_TYPE == 0
+SdFat sd;
+File file;
+File root;
+#elif SD_FAT_TYPE == 1
+SdFat32 sd;
+File32 file;
+File32 root;
+#elif SD_FAT_TYPE == 2
+SdExFat sd;
+ExFile file;
+ExFile root;
+#elif SD_FAT_TYPE == 3
+SdFs sd;
+FsFile file;
+FsFile root;
+#endif  // SD_FAT_TYPE
+
 // -----------------------------------------------------------------------
 // MIDI
 // -----------------------------------------------------------------------
@@ -159,6 +177,7 @@ void setup(void)
   // Draw a single pixel in white
   display.drawPixel(10, 10, SSD1306_WHITE);
 
+
   // Show the display buffer on the screen. You MUST call display() after
   // drawing commands to make them visible on screen!
   display.display();
@@ -185,7 +204,28 @@ void loop(void)
   static uint32_t timeStart;
 
   Serial.println(F("Listing files on SD card:"));
-  SD.ls(&Serial);
+  //SD.ls(&Serial);
+
+  if (!root.open("/")) {
+    Serial.println("ERROR Opening Root");
+  }
+
+  while (file.openNext(&root, O_RDONLY)) {
+    char buf[255];
+    file.getName(buf, 255);
+
+    String sbuf(buf);
+    Serial.println(sbuf);
+
+    display.clearDisplay();
+    display.setTextSize(1);                 // Normal 1:1 pixel scale
+    display.setTextColor(SSD1306_WHITE);    // Draw white text
+    display.setCursor(0,10);                // Start at top-left corner
+    display.println(sbuf);
+    display.display();   
+
+    delay(1000);
+  }
 
   switch (state)
   {
