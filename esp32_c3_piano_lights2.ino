@@ -6,6 +6,27 @@
 //  SD card interface - change SD_SELECT for SPI comms
 //  I/O defined for custom notes output - Change pin definitions for specific 
 //      hardware or other hardware actuation - defined below.
+
+// -----------------------------------------------------------------------
+// OLED
+// -----------------------------------------------------------------------
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+// The pins for I2C are defined by the Wire-library. 
+// On an arduino UNO:       A4(SDA), A5(SCL)
+// On an arduino MEGA 2560: 20(SDA), 21(SCL)
+// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 // -----------------------------------------------------------------------
 // Neopixel
 // -----------------------------------------------------------------------
@@ -125,6 +146,25 @@ void setup(void)
 #endif
   DEBUGS("\n[MidiFile Play I/O]");
 
+  // OLED
+  Wire.begin(8,9);
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+
+  // Clear the buffer
+  display.clearDisplay();
+
+  // Draw a single pixel in white
+  display.drawPixel(10, 10, SSD1306_WHITE);
+
+  // Show the display buffer on the screen. You MUST call display() after
+  // drawing commands to make them visible on screen!
+  display.display();
+
+  delay(2000);
+
   NeoPixel.begin();  // initialize NeoPixel strip object (REQUIRED)
 
   // Initialize SD
@@ -144,6 +184,9 @@ void loop(void)
   static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
   static uint32_t timeStart;
 
+  Serial.println(F("Listing files on SD card:"));
+  SD.ls(&Serial);
+
   switch (state)
   {
   case S_IDLE:    // now idle, set up the next tune
@@ -153,6 +196,19 @@ void loop(void)
       DEBUGS("\nS_IDLE");
 
       // play the file name
+
+
+
+      display.clearDisplay();
+
+      display.setTextSize(1);                 // Normal 1:1 pixel scale
+      display.setTextColor(SSD1306_WHITE);    // Draw white text
+      display.setCursor(0,0);                 // Start at top-left corner
+      display.println(F("Filename"));
+      display.setCursor(0,10);                // Start at top-left corner
+      display.println(F(fileName));
+      display.display();      
+
       DEBUG("\nFile: ", fileName);
       err = SMF.load(fileName);
       if (err != MD_MIDIFile::E_OK)
