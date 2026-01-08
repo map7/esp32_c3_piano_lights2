@@ -210,21 +210,25 @@ void loop(void)
     Serial.println("ERROR Opening Root");
   }
 
+  // Step through each file
   while (file.openNext(&root, O_RDONLY)) {
     char buf[255];
+    
     file.getName(buf, 255);
 
-    String sbuf(buf);
-    Serial.println(sbuf);
+    if (strstr(buf, ".mid")){
+      String sbuf(buf);
+      Serial.println(sbuf);
 
-    display.clearDisplay();
-    display.setTextSize(1);                 // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);    // Draw white text
-    display.setCursor(0,10);                // Start at top-left corner
-    display.println(sbuf);
-    display.display();   
+      display.clearDisplay();
+      display.setTextSize(1);                 // Normal 1:1 pixel scale
+      display.setTextColor(SSD1306_WHITE);    // Draw white text
+      display.setCursor(0,10);                // Start at top-left corner
+      display.println(sbuf);
+      display.display();   
 
-    delay(1000);
+      delay(1000);
+    }
   }
 
   switch (state)
