@@ -213,6 +213,7 @@ void loop(void)
 
   // Step through each file
   int index = 0;
+  int selected = 1;
   display.clearDisplay();
 
   while (file.openNext(&root, O_RDONLY)) {
@@ -226,6 +227,11 @@ void loop(void)
 
       display.setTextSize(1);                 // Normal 1:1 pixel scale
       display.setTextColor(SSD1306_WHITE);    // Draw white text
+
+      if (index == selected){
+        sbuf = "* " + sbuf;
+      }
+      
       display.setCursor(0,10 * index);                // Start at top-left corner
       display.println(sbuf);
       display.display();   
