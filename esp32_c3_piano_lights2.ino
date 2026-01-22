@@ -107,6 +107,16 @@ const uint8_t SILENT = LOW;
 SDFAT	SD;
 MD_MIDIFile SMF;
 
+// -----------------------------------------------------------------------
+// Rotary 
+// -----------------------------------------------------------------------
+#define CLK_PIN 20
+#define DT_PIN 21
+#define SW_PIN 10
+volatile int encoderPos = 0; // Use 'volatile' as the variable is changed by an interrupt
+int lastEncoderPos = 0;
+unsigned long last_run=0;
+
 void playNote(uint8_t note, bool state)
 {
   if (note > 128) return;
@@ -157,6 +167,22 @@ void midiCallback(midi_event *pev)
   // }
 }
 
+// Rotary: Interrupt Service Routine (ISR)
+void doEncoder() {
+  if (millis()-last_run>20){
+    // Read the current state of CLK pin
+    int currentCLK = digitalRead(CLK_PIN);
+    
+    // If the CLK state is different from the DT state, it is rotating in one direction
+    if (currentCLK != digitalRead(DT_PIN)) {
+      encoderPos++; // Clockwise
+    } else {
+      encoderPos--; // Counter-clockwise
+    }
+    last_run=millis();
+  }  
+}
+
 void setup(void)
 {
 #if USE_DEBUG
@@ -197,12 +223,37 @@ void setup(void)
   // Initialize MIDIFile
   SMF.begin(&SD);
   SMF.setMidiHandler(midiCallback);
+
+  // Rotary Setup
+  pinMode(CLK_PIN, INPUT_PULLUP);
+  pinMode(DT_PIN, INPUT_PULLUP);
+  pinMode(SW_PIN, INPUT_PULLUP); // Use INPUT_PULLUP for the button as well
+  
+  // Attach the interrupt to the CLK pin.
+  // The 'CHANGE' mode triggers the doEncoder function on both rising and falling edges.
+  attachInterrupt(digitalPinToInterrupt(CLK_PIN), doEncoder, CHANGE);  
+  Serial.println("Rotary Encoder Test: BEGIN");
 }
 
 void loop(void)
 {
   static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
   static uint32_t timeStart;
+
+  // Rotary test
+  // Check if the position has changed and print the new value
+  if (lastEncoderPos != encoderPos) {
+    Serial.print("Encoder Count: ");
+    Serial.println(encoderPos);
+    lastEncoderPos = encoderPos;
+  }
+  
+  // Check the button state (button is LOW when pressed due to pullup)
+  if (digitalRead(SW_PIN) == LOW) {
+    Serial.println("Button Pressed!");
+    // Add a small delay/debouncing for the button press
+    delay(200); 
+  }
 
   Serial.println(F("Listing files on SD card:"));
   //SD.ls(&Serial);
@@ -251,8 +302,6 @@ void loop(void)
       DEBUGS("\nS_IDLE");
 
       // play the file name
-
-
 
       display.clearDisplay();
 
