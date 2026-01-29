@@ -123,6 +123,9 @@ volatile int encoderPos = 0; // Use 'volatile' as the variable is changed by an 
 int lastEncoderPos = 0;
 unsigned long last_run=0;
 
+// File listing selection variables
+int selected = -1;
+
 void playNote(uint8_t note, bool state)
 {
   if (note > 128) return;
@@ -249,6 +252,8 @@ void setup(void)
   // The 'CHANGE' mode triggers the doEncoder function on both rising and falling edges.
   attachInterrupt(digitalPinToInterrupt(CLK_PIN), doEncoder, CHANGE);  
   Serial.println("Rotary Encoder Test: BEGIN");
+
+  list_files();  
 }
 
 void list_files(){
@@ -264,7 +269,6 @@ void list_files(){
 
   // Step through each file
   int index = 0;
-  int selected = 0;
   display.clearDisplay();
 
   while (file.openNext(&root, O_RDONLY)) {
@@ -294,6 +298,7 @@ void list_files(){
       index++;
     }
   }
+  display.display();
 }
 
 void loop(void)
@@ -301,7 +306,7 @@ void loop(void)
   static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
   static uint32_t timeStart;
 
-  list_files();
+
 
   // Rotary test
   // Check if the position has changed and print the new value
@@ -329,15 +334,15 @@ void loop(void)
 
       // play the file name
 
-      display.clearDisplay();
+      //display.clearDisplay();
 
-      display.setTextSize(1);                 // Normal 1:1 pixel scale
-      display.setTextColor(SSD1306_WHITE);    // Draw white text
-      display.setCursor(0,0);                 // Start at top-left corner
-      display.println(F("Filename"));
-      display.setCursor(0,10);                // Start at top-left corner
-      display.println(F(fileName));
-      display.display();      
+      //display.setTextSize(1);                 // Normal 1:1 pixel scale
+      //display.setTextColor(SSD1306_WHITE);    // Draw white text
+      //display.setCursor(0,0);                 // Start at top-left corner
+      //display.println(F("Filename"));
+      //display.setCursor(0,10);                // Start at top-left corner
+      //display.println(F(fileName));
+      //display.display();      
 
 
       DEBUG("\nFile: ", fileName);
