@@ -251,31 +251,13 @@ void setup(void)
   Serial.println("Rotary Encoder Test: BEGIN");
 }
 
-void loop(void)
-{
-  static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
-  static uint32_t timeStart;
-
-  // Rotary test
-  // Check if the position has changed and print the new value
-  if (lastEncoderPos != encoderPos) {
-    Serial.print("Encoder Count: ");
-    Serial.println(encoderPos);
-    lastEncoderPos = encoderPos;
-  }
-  
-  // Check the button state (button is LOW when pressed due to pullup)
-  if (digitalRead(SW_PIN) == LOW) {
-    Serial.println("Button Pressed!");
-    // Add a small delay/debouncing for the button press
-    delay(200); 
-  }
-
+void list_files(){
   if (DEBUG_OUTPUT == 2) {
     Serial.println(F("Listing files on SD card:"));
   }
   //SD.ls(&Serial);
 
+  // Get listing of files
   if (!root.open("/")) {
     Serial.println("ERROR Opening Root");
   }
@@ -312,6 +294,30 @@ void loop(void)
       index++;
     }
   }
+}
+
+void loop(void)
+{
+  static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
+  static uint32_t timeStart;
+
+  list_files();
+
+  // Rotary test
+  // Check if the position has changed and print the new value
+  if (lastEncoderPos != encoderPos) {
+    Serial.print("Encoder Count: ");
+    Serial.println(encoderPos);
+    lastEncoderPos = encoderPos;
+  }
+  
+  // Check the button state (button is LOW when pressed due to pullup)
+  if (digitalRead(SW_PIN) == LOW) {
+    Serial.println("Button Pressed!");
+    // Add a small delay/debouncing for the button press
+    delay(200); 
+  }
+
 
   switch (state)
   {
