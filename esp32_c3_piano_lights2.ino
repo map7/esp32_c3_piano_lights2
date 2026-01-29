@@ -42,6 +42,12 @@ Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
 #include <SdFat.h>
 #include <MD_MIDIFile.h>
 
+// DEBUG OUTPUT used to filter results in the serial monitor
+// 1 = NOTES
+// 2 = FILES
+// 3 = ROTARY
+#define DEBUG_OUTPUT 3 
+
 // Defining the printout
 #define USE_DEBUG  1   // set to 1 to enable MIDI output, otherwise debug output
 
@@ -121,8 +127,10 @@ void playNote(uint8_t note, bool state)
 {
   if (note > 128) return;
 
-  DEBUG("\nNOTE: ", note);
-  DEBUG("\nSTATE: ", state);
+  if (DEBUG_OUTPUT == 1) {
+    DEBUG("\nNOTE: ", note);
+    DEBUG("\nSTATE: ", state);
+  }
 
   //NeoPixel.clear();  // set all pixel colors to 'off'. It only takes effect if pixels.show() is called
 
@@ -141,24 +149,32 @@ void midiCallback(midi_event *pev)
 // Note: MIDI Channel 10 (pev->channel == 9) is for percussion instruments
 {
   // if(pev->channel+1 == 1){
-    DEBUG("\n", millis());
-    DEBUG("\tM T", pev->track);
-    DEBUG(":  Ch ", pev->channel+1);
-    DEBUGS(" Data");
+
+    if (DEBUG_OUTPUT == 1) {
+      DEBUG("\n", millis());
+      DEBUG("\tM T", pev->track);
+      DEBUG(":  Ch ", pev->channel+1);
+      DEBUGS(" Data");
+    }
 
     for (uint8_t i=0; i<pev->size; i++)
-      DEBUGX(" ", pev->data[i]);
-
+      if (DEBUG_OUTPUT == 1) {
+        DEBUGX(" ", pev->data[i]);
+      }
     // Handle the event through our I/O interface
     switch (pev->data[0])
     {
     case NOTE_OFF:    // [1]=note no, [2]=velocity
-      DEBUGS(" NOTE_OFF");
+      if (DEBUG_OUTPUT == 1) {
+        DEBUGS(" NOTE_OFF");
+      }
       playNote(pev->data[1], SILENT);
       break;
 
     case NOTE_ON:     // [1]=note_no, [2]=velocity
-      DEBUGS(" NOTE_ON");
+      if (DEBUG_OUTPUT == 1) {
+        DEBUGS(" NOTE_ON");
+      }
       // Note ON with velocity 0 is the same as off
       playNote(pev->data[1], (pev->data[2] == 0) ? SILENT : ACTIVE);
       break;
@@ -255,7 +271,9 @@ void loop(void)
     delay(200); 
   }
 
-  Serial.println(F("Listing files on SD card:"));
+  if (DEBUG_OUTPUT == 2) {
+    Serial.println(F("Listing files on SD card:"));
+  }
   //SD.ls(&Serial);
 
   if (!root.open("/")) {
@@ -264,7 +282,7 @@ void loop(void)
 
   // Step through each file
   int index = 0;
-  int selected = 1;
+  int selected = 0;
   display.clearDisplay();
 
   while (file.openNext(&root, O_RDONLY)) {
@@ -274,7 +292,11 @@ void loop(void)
 
     if (strstr(buf, ".mid")){
       String sbuf(buf);
-      Serial.println(sbuf);
+  
+      if (DEBUG_OUTPUT == 2) {
+        Serial.println(sbuf);
+        delay(1000);
+      }
 
       display.setTextSize(1);                 // Normal 1:1 pixel scale
       display.setTextColor(SSD1306_WHITE);    // Draw white text
@@ -288,8 +310,6 @@ void loop(void)
       display.display();   
 
       index++;
-
-      delay(1000);
     }
   }
 
@@ -312,6 +332,7 @@ void loop(void)
       display.setCursor(0,10);                // Start at top-left corner
       display.println(F(fileName));
       display.display();      
+
 
       DEBUG("\nFile: ", fileName);
       err = SMF.load(fileName);
