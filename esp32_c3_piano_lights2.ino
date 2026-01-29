@@ -308,12 +308,14 @@ void loop(void)
 
 
 
-  // Rotary test
+  // Rotary select song
   // Check if the position has changed and print the new value
   if (lastEncoderPos != encoderPos) {
     Serial.print("Encoder Count: ");
     Serial.println(encoderPos);
     lastEncoderPos = encoderPos;
+    selected = encoderPos;
+    list_files();
   }
   
   // Check the button state (button is LOW when pressed due to pullup)
