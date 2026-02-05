@@ -257,7 +257,8 @@ void setup(void)
   attachInterrupt(digitalPinToInterrupt(CLK_PIN), doEncoder, CHANGE);  
   Serial.println("Rotary Encoder Test: BEGIN");
 
-  list_files();  
+  list_files();
+  display_files();
 }
 
 void list_files(){
@@ -271,9 +272,6 @@ void list_files(){
     Serial.println("ERROR Opening Root");
   }
 
-  // Step through each file
-  int index = 0;
-  display.clearDisplay();
 
   while (file.openNext(&root, O_RDONLY)) {
     char buf[255];
@@ -288,32 +286,37 @@ void list_files(){
         delay(1000);
       }
 
-      display.setTextSize(1);                 // Normal 1:1 pixel scale
-      display.setTextColor(SSD1306_WHITE);    // Draw white text
-
-      if (index == selected){
-        sbuf = "* " + sbuf;
-      }
-      
       // Store current file from listing into Vector
       files.push_back(sbuf);
-
-
-
-      display.setCursor(0,10 * index);                // Start at top-left corner
-      display.println(sbuf);
-      display.display();   
-
-      index++;
     }
   }
-  display.display();
 }
 
 void display_files(){
+  // Step through each file
+  int index = 0;
+  display.clearDisplay();
+
   for (const auto &file : files) {
-    Serial.println(file.c_str());
+    String file2(file.c_str());
+
+    display.setTextSize(1);                 // Normal 1:1 pixel scale
+    display.setTextColor(SSD1306_WHITE);    // Draw white text
+
+    if (index == selected){
+      file2 = "* " + file2;
+    }
+    
+    display.setCursor(0,10 * index);                // Start at top-left corner
+    display.println(file2);
+    display.display();   
+
+    index++;
+
+    //Serial.println(file.c_str());
   }
+
+  display.display();
 }
 
 void loop(void)
@@ -321,7 +324,7 @@ void loop(void)
   static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
   static uint32_t timeStart;
 
-  display_files();
+  
 
   // Rotary select song
   // Check if the position has changed and print the new value
@@ -330,7 +333,7 @@ void loop(void)
     Serial.println(encoderPos);
     lastEncoderPos = encoderPos;
     selected = encoderPos;
-    list_files();
+    display_files();
   }
   
   // Check the button state (button is LOW when pressed due to pullup)
