@@ -7,6 +7,8 @@
 //  I/O defined for custom notes output - Change pin definitions for specific 
 //      hardware or other hardware actuation - defined below.
 
+#include <vector>
+
 // -----------------------------------------------------------------------
 // OLED
 // -----------------------------------------------------------------------
@@ -96,6 +98,8 @@ const uint16_t WAIT_DELAY = 2000; // ms
 // Define constants for MIDI channel voice message IDs
 const uint8_t NOTE_OFF = 0x80;    // note on
 const uint8_t NOTE_ON = 0x90;     // note off. NOTE_ON with velocity 0 is same as NOTE_OFF
+
+
 
 // The files in should be located on the SD card
 //const char fileName[] = "pianosolo.mid";
@@ -208,6 +212,17 @@ void setup(void)
   Serial.begin(57600);
 #endif
   DEBUGS("\n[MidiFile Play I/O]");
+
+  // Play with vectors
+  std::vector<String> files;
+  files.push_back("file1");
+
+  for (const auto &file : files) {
+    Serial.println(file.c_str());
+    delay(10000);
+  }
+
+
 
   // OLED
   Wire.begin(8,9);
