@@ -104,7 +104,7 @@ std::vector<String> files;
 // The files in should be located on the SD card
 //const char fileName[] = "pianosolo.mid";
 //const char fileName[] = "furelise.mid";
-const char fileName[] = "Let_It_Be.mid";
+char fileName[] = "Let_It_Be.mid";
 //const char fileName[] = "test.mid";
 //const char fileName[] = "the_final_countdown.mid";
 //const char fileName[] = "LOOPDEMO.MID";
@@ -340,6 +340,9 @@ void loop(void)
   if (digitalRead(SW_PIN) == LOW) {
     Serial.println("Button Pressed!");
     // Add a small delay/debouncing for the button press
+
+    files[selected].toCharArray(fileName, files[selected].length()+1);
+    Serial.println(fileName);
     delay(200); 
   }
 
