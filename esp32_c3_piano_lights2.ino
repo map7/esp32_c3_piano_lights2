@@ -7,8 +7,6 @@
 //  I/O defined for custom notes output - Change pin definitions for specific 
 //      hardware or other hardware actuation - defined below.
 
-#include <vector>
-
 // -----------------------------------------------------------------------
 // OLED
 // -----------------------------------------------------------------------
@@ -86,7 +84,7 @@ Adafruit_NeoPixel NeoPixel(NUM_PIXELS, PIN_NEO_PIXEL, NEO_GRB + NEO_KHZ800);
 #endif  // SD_FAT_TYPE
 
 // -----------------------------------------------------------------------
-// MIDI
+// SD CARD
 // -----------------------------------------------------------------------
 
 // SD chip select pin for SPI comms.
@@ -100,6 +98,8 @@ const uint8_t NOTE_OFF = 0x80;    // note on
 const uint8_t NOTE_ON = 0x90;     // note off. NOTE_ON with velocity 0 is same as NOTE_OFF
 
 
+#include <vector>
+std::vector<String> files;
 
 // The files in should be located on the SD card
 //const char fileName[] = "pianosolo.mid";
@@ -213,17 +213,6 @@ void setup(void)
 #endif
   DEBUGS("\n[MidiFile Play I/O]");
 
-  // Play with vectors
-  std::vector<String> files;
-  files.push_back("file1");
-
-  for (const auto &file : files) {
-    Serial.println(file.c_str());
-    delay(10000);
-  }
-
-
-
   // OLED
   Wire.begin(8,9);
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -306,6 +295,11 @@ void list_files(){
         sbuf = "* " + sbuf;
       }
       
+      // Store current file from listing into Vector
+      files.push_back(sbuf);
+
+
+
       display.setCursor(0,10 * index);                // Start at top-left corner
       display.println(sbuf);
       display.display();   
@@ -316,12 +310,18 @@ void list_files(){
   display.display();
 }
 
+void display_files(){
+  for (const auto &file : files) {
+    Serial.println(file.c_str());
+  }
+}
+
 void loop(void)
 {
   static enum { S_IDLE, S_PLAYING, S_END, S_PAUSE } state = S_IDLE;
   static uint32_t timeStart;
 
-
+  display_files();
 
   // Rotary select song
   // Check if the position has changed and print the new value
